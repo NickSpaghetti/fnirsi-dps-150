@@ -22,9 +22,8 @@ jobs:
       - name: Build Melange Package
         run: |
           melange keygen melange.rsa
-          # Note: We use sudo because melange uses bubblewrap for isolation
           sudo melange build fnirsi-dps-150.yaml \
-            --arch x86_64 \
+            --arch x86_64,aarch64 \
             --signing-key melange.rsa
 
       - name: Login to GHCR
