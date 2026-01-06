@@ -46,6 +46,6 @@ jobs:
         uses: chainguard-images/actions/apko-publish@main
         with:
           config: apko.yaml
-          tag: ${{ steps.meta.outputs.tags }}
+          tag: ${{ fromJson(steps.meta.outputs.json).tags[0] }}
           keyring-append: melange.rsa.pub
           archs: x86_64,aarch64
