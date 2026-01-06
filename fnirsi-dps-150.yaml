@@ -1,16 +1,12 @@
 package:
-  name: my-bun-app
+  name: fnirsi-dps-150
   version: 1.0.0
   epoch: 0
   description: "A secure Bun-based static server for Wolfi"
-  target-architecture:
-    - all
-  dependencies:
-    runtime:
-      - bun
-      - busybox
 
 environment:
+  repositories:
+    - https://dl-cdn.wolfi.dev/wolfi/main
   contents:
     packages:
       - wolfi-base
