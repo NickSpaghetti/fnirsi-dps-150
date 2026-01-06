@@ -16,6 +16,15 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v4
 
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=sha,prefix=sha-,enable=true
+
       - name: Setup Melange
         uses: chainguard-dev/actions/setup-melange@main
 
@@ -37,6 +46,6 @@ jobs:
         uses: chainguard-images/actions/apko-publish@main
         with:
           config: apko.yaml
-          tag: ghcr.io/${{ github.repository_owner }}/fnirsi-dps-150:latest
+          tag: ${{ steps.meta.outputs.tags }}
           keyring-append: melange.rsa.pub
           archs: x86_64,aarch64
