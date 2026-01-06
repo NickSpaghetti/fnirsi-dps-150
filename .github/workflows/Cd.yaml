@@ -3,7 +3,7 @@ name: Build Wolfi Image
 on:
   push:
     branches: [ "main" ]
-  workflow_dispatch: # Allows manual triggering
+  workflow_dispatch:
 
 jobs:
   build:
@@ -16,28 +16,20 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v4
 
-      # 1. Install Melange
       - name: Setup Melange
         uses: chainguard-dev/actions/setup-melange@main
 
-      # 2. Generate signing keys and build the .apk
       - name: Build Melange Package
         run: |
-          # Generate a local key to sign your custom package
           melange keygen melange.rsa
-          
-          # Build the package defined in your melange.yaml
-          # This creates a ./packages directory
+          # Note: We use sudo because melange uses bubblewrap for isolation
           sudo melange build fnirsi-dps-150.yaml \
             --arch x86_64 \
-            --signing-key melange.rsa \
-            --env-file build-env.vars
+            --signing-key melange.rsa
 
-      # 3. Install apko
       - name: Setup apko
         uses: chainguard-dev/actions/setup-apko@main
 
-      # 4. Login to GitHub Container Registry
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
@@ -45,7 +37,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # 5. Build the final image using the local .apk
       - name: Build and Push Image
         uses: chainguard-dev/actions/apko-publish@main
         with:
