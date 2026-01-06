@@ -1,0 +1,48 @@
+package:
+  name: my-bun-app
+  version: 1.0.0
+  epoch: 0
+  description: "A secure Bun-based static server for Wolfi"
+  target-architecture:
+    - all
+  dependencies:
+    runtime:
+      - bun
+      - busybox
+
+environment:
+  contents:
+    packages:
+      - wolfi-base
+      - busybox
+      - bun
+      - build-base
+
+pipeline:
+  - name: Build and Package
+    runs: |
+      # 1. Prepare directories
+      # ${{targets.destdir}} is the 'root' of your future package
+      APP_DIR="${{targets.destdir}}/usr/lib/my-app"
+      BIN_DIR="${{targets.destdir}}/usr/bin"
+      mkdir -p "$APP_DIR" "$BIN_DIR"
+
+      # 2. Install production dependencies
+      # We use --production to keep the package small
+      bun install --frozen-lockfile --production
+
+      # 3. Copy application files
+      # Only copy what's needed to run (source, node_modules, package.json)
+      cp -r . "$APP_DIR/"
+
+      # 4. Create the entrypoint script
+      # This matches your "start": "bun x serve ." requirement
+      cat <<EOF > "$BIN_DIR/my-app"
+      #!/bin/sh
+      cd /usr/lib/my-app
+      exec bun x serve .
+      EOF
+      
+      chmod +x "$BIN_DIR/my-app"
+
+  - uses: strip
