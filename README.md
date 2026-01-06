@@ -66,7 +66,9 @@ sequenceDiagram
 To run this project locally, simply start a static file server in the project root. For example, using [serve](https://www.npmjs.com/package/serve):
 
 ```sh
-npx serve .
+make start
+or
+bun run start
 ```
 
 Then open the displayed local URL in Google Chrome.
