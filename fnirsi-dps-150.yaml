@@ -25,15 +25,16 @@ pipeline:
       mkdir -p "$APP_DIR" "$BIN_DIR"
 
       # 2. Install production dependencies
-      # Note: This requires package.json and bun.lockb to exist in the root
       bun install --frozen-lockfile --production
 
-      # 3. Copy application files
-      cp -r . "$APP_DIR/"
+      # 3. Copy application files selectively (avoids recursion)
+      # This copies all files/folders EXCEPT the melange output folders
+      find . -maxdepth 1 ! -name 'melange-*' ! -name '.' ! -name '..' -exec cp -r {} "$APP_DIR/" \;
 
       # 4. Create the entrypoint script
       cat <<EOF > "$BIN_DIR/my-app"
       #!/bin/sh
+      # The 'serve' command needs to run from the app directory
       cd /usr/lib/my-app
       exec bun x serve .
       EOF
