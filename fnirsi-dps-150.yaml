@@ -6,9 +6,8 @@ package:
 
 environment:
   contents:
-    # REPOSITORIES MUST BE HERE
     repositories:
-      - https://dl-cdn.wolfi.dev/wolfi/main
+      - https://packages.wolfi.dev/os
     keyring:
       - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
     packages:
