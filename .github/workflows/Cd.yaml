@@ -27,9 +27,6 @@ jobs:
             --arch x86_64 \
             --signing-key melange.rsa
 
-      - name: Setup apko
-        uses: chainguard-dev/actions/setup-apko@main
-
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
@@ -38,7 +35,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and Push Image
-        uses: chainguard-images/actions/setup-apko@main
+        uses: chainguard-images/actions/apko-publish@main
         with:
           config: apko.yaml
           tag: ghcr.io/${{ github.repository_owner }}/fnirsi-dps-150:latest
