@@ -1,0 +1,40 @@
+name: Build Wolfi Image
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write 
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      # 1. Setup Melange (The APK Builder)
+      - name: Setup Melange
+        uses: chainguard-dev/actions/setup-melange@main
+
+      # 2. Build the Package
+      # This generates your .apk files in a local './packages' folder
+      - name: Build Melange Package
+        run: |
+          melange build my-bun-app.yaml \
+            --arch x86_64,aarch64 \
+            --signing-key melange.rsa
+
+      # 3. Setup apko (The Image Assembler)
+      - name: Setup apko
+        uses: chainguard-dev/actions/setup-apko@main
+
+      # 4. Build and Publish the Image
+      - name: Build and Push Image
+        uses: chainguard-dev/actions/apko-publish@main
+        with:
+          config: apko.yaml
+          tag: ghcr.io/${{ github.repository_owner }}/fnirsi-dps-150:latest
+          keyring-append: melange.rsa.pub
+          source-context: .
