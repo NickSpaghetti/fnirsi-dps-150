@@ -5,9 +5,12 @@ package:
   description: "A secure Bun-based static server for Wolfi"
 
 environment:
-  repositories:
-    - https://dl-cdn.wolfi.dev/wolfi/main
   contents:
+    # REPOSITORIES MUST BE HERE
+    repositories:
+      - https://dl-cdn.wolfi.dev/wolfi/main
+    keyring:
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
     packages:
       - wolfi-base
       - busybox
@@ -18,21 +21,18 @@ pipeline:
   - name: Build and Package
     runs: |
       # 1. Prepare directories
-      # ${{targets.destdir}} is the 'root' of your future package
       APP_DIR="${{targets.destdir}}/usr/lib/my-app"
       BIN_DIR="${{targets.destdir}}/usr/bin"
       mkdir -p "$APP_DIR" "$BIN_DIR"
 
       # 2. Install production dependencies
-      # We use --production to keep the package small
+      # Note: This requires package.json and bun.lockb to exist in the root
       bun install --frozen-lockfile --production
 
       # 3. Copy application files
-      # Only copy what's needed to run (source, node_modules, package.json)
       cp -r . "$APP_DIR/"
 
       # 4. Create the entrypoint script
-      # This matches your "start": "bun x serve ." requirement
       cat <<EOF > "$BIN_DIR/my-app"
       #!/bin/sh
       cd /usr/lib/my-app
